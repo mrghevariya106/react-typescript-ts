@@ -5,14 +5,14 @@ import {
   API_KEY,
   REQUEST_TOKEN_URL,
   LOGIN_URL,
-  SESSION_ID_URL,
-} from "./config";
+  SESSION_ID_URL
+} from './config';
 
 const defaultConfig = {
-  method: "POST",
+  method: 'POST',
   headers: {
-    "Content-Type": "application/json",
-  },
+    'Content-Type': 'application/json'
+  }
 };
 
 // Types
@@ -58,7 +58,7 @@ export type Credits = {
   crew: Crew[];
 };
 
-const apiSettings = {
+export default {
   fetchMovies: async (searchTerm: string, page: number): Promise<Movies> => {
     const endpoint: string = searchTerm
       ? `${SEARCH_BASE_URL}${searchTerm}&page=${page}`
@@ -78,17 +78,21 @@ const apiSettings = {
     const reqToken = await (await fetch(REQUEST_TOKEN_URL)).json();
     return reqToken.request_token;
   },
-  authenticate: async (requestToken: string, username: string, password: string) => {
+  authenticate: async (
+    requestToken: string,
+    username: string,
+    password: string
+  ) => {
     const bodyData = {
       username,
       password,
-      request_token: requestToken,
+      request_token: requestToken
     };
     // First authenticate the requestToken
     const data = await (
       await fetch(LOGIN_URL, {
         ...defaultConfig,
-        body: JSON.stringify(bodyData),
+        body: JSON.stringify(bodyData)
       })
     ).json();
     // Then get the sessionId with the requestToken
@@ -96,24 +100,10 @@ const apiSettings = {
       const sessionId = await (
         await fetch(SESSION_ID_URL, {
           ...defaultConfig,
-          body: JSON.stringify({ request_token: requestToken }),
+          body: JSON.stringify({ request_token: requestToken })
         })
       ).json();
       return sessionId;
     }
-  },
-  rateMovie: async (sessionId: string, movieId: number, value: string) => {
-    const endpoint = `${API_URL}movie/${movieId}/rating?api_key=${API_KEY}&session_id=${sessionId}`;
-
-    const rating = await (
-      await fetch(endpoint, {
-        ...defaultConfig,
-        body: JSON.stringify({ value }),
-      })
-    ).json();
-
-    return rating;
-  },
+  }
 };
-
-export default apiSettings;
